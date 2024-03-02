@@ -20,7 +20,6 @@ public class AppController {
     @PostMapping("/equation")
     public ResponseEntity<String> equation() {
         final HttpHeaders httpHeaders = new HttpHeaders();
-        System.out.println("it's method edssldflk");
         return new ResponseEntity<>("{\"message\": \"Hello from secured endpoint\"}", httpHeaders, HttpStatus.OK);
     }
 }
