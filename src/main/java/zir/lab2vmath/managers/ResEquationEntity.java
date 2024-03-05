@@ -1,10 +1,10 @@
 package zir.lab2vmath.managers;
 
-public class ResEntity {
+public class ResEquationEntity {
     private String uknownX;
     private String fun;
 
-    public ResEntity(String uknownX, String fun) {
+    public ResEquationEntity(String uknownX, String fun) {
         this.uknownX = uknownX;
         this.fun=fun;
     }

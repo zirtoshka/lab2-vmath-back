@@ -25,7 +25,7 @@ public class EquationManager {
     private Map<Integer, Function<BigDecimal, BigDecimal>> functionMap = new HashMap<>();
     private Map<Integer, Function<BigDecimal, BigDecimal>> derivativeFunctionMap = new HashMap<>();
     private Map<Integer, Function<BigDecimal, BigDecimal>> secondDerivativeFunctionMap = new HashMap<>();
-    private Map<Integer, Function<HashMap<String, BigDecimal>, ResEntity>> methodMap = new HashMap<>();
+    private Map<Integer, Function<HashMap<String, BigDecimal>, ResEquationEntity>> methodMap = new HashMap<>();
 
 
     public EquationManager() {
@@ -55,7 +55,7 @@ public class EquationManager {
     }
 
 
-    public ResEntity getSolvingEquation() throws BadIntervalException {
+    public ResEquationEntity getSolvingEquation() throws BadIntervalException {
         checkRangeOfAcceptableValues();
         if (  !checkExistenceOfRoots()  ) {
             throw new BadIntervalException("Ваш интервал слишком сложный для меня: на нем либо несколько корней, либо нет вообще. Можно что-то попроще?");
@@ -83,7 +83,7 @@ public class EquationManager {
     }
 
 
-    private ResEntity methodOfHalfDivision(HashMap<String, BigDecimal> args) {
+    private ResEquationEntity methodOfHalfDivision(HashMap<String, BigDecimal> args) {
         BigDecimal firstBoundaryOfInterval = args.get(Config.firstBoundaryOfInterval);
         BigDecimal secondBoundaryOfInterval = args.get(Config.secondBoundaryOfInterval);
         BigDecimal inaccuracy = args.get(Config.inaccuracy);
@@ -101,13 +101,13 @@ public class EquationManager {
 
         }
 //        x = x.setScale(inaccuracy.scale(), RoundingMode.UP);
-        ResEntity res = new ResEntity(x.toString(), functionMap.get(func).apply(x).setScale(inaccuracy.scale() + 3, RoundingMode.UP).toString());
+        ResEquationEntity res = new ResEquationEntity(x.toString(), functionMap.get(func).apply(x).setScale(inaccuracy.scale() + 3, RoundingMode.UP).toString());
 
 
         return res;
     }
 
-    private ResEntity methodFromNewton(HashMap<String, BigDecimal> args) {
+    private ResEquationEntity methodFromNewton(HashMap<String, BigDecimal> args) {
         BigDecimal firstBoundaryOfInterval = args.get(Config.firstBoundaryOfInterval);
         BigDecimal secondBoundaryOfInterval = args.get(Config.secondBoundaryOfInterval);
         BigDecimal inaccuracy = args.get(Config.inaccuracy);
@@ -133,11 +133,11 @@ public class EquationManager {
             x = x.subtract(functionMap.get(func).apply(x).divide(derivativeFunctionMap.get(func).apply(x), MathContext.DECIMAL32));
         }
         System.out.println(x.toString());
-        ResEntity res = new ResEntity(x.toString(), functionMap.get(func).apply(x).setScale(inaccuracy.scale() + 3, RoundingMode.UP).toString());
+        ResEquationEntity res = new ResEquationEntity(x.toString(), functionMap.get(func).apply(x).setScale(inaccuracy.scale() + 3, RoundingMode.UP).toString());
         return res;
     }
 
-    private ResEntity simpleIterationMethod(HashMap<String, BigDecimal> args) {
+    private ResEquationEntity simpleIterationMethod(HashMap<String, BigDecimal> args) {
         BigDecimal firstBoundaryOfInterval = args.get(Config.firstBoundaryOfInterval);
         BigDecimal secondBoundaryOfInterval = args.get(Config.secondBoundaryOfInterval);
         BigDecimal inaccuracy = args.get(Config.inaccuracy);
@@ -161,7 +161,7 @@ public class EquationManager {
             x = lambda.multiply(functionMap.get(func).apply(x)).setScale(inaccuracy.scale() + 2, RoundingMode.UP).add(x);
             System.out.println(x.toString());
         }
-        ResEntity res = new ResEntity(x.toString(), functionMap.get(func).apply(x).setScale(inaccuracy.scale() + 3, RoundingMode.UP).toString());
+        ResEquationEntity res = new ResEquationEntity(x.toString(), functionMap.get(func).apply(x).setScale(inaccuracy.scale() + 3, RoundingMode.UP).toString());
 
         return res;
     }

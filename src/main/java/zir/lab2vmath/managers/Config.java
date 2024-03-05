@@ -5,4 +5,7 @@ public  class Config {
     public static final String secondBoundaryOfInterval="secondBoundaryOfInterval";
     public static final String inaccuracy="inaccuracy";
 //    public static final String func="func";
+    public static final String initialApproximationByX="initialApproximationByX";
+    public static final String initialApproximationByY="initialApproximationByY";
+
 }
