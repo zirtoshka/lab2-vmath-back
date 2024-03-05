@@ -1,18 +1,15 @@
 package zir.lab2vmath.managers;
 
 import exc.BadIntervalException;
-import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.lang.reflect.Method;
 import java.math.BigDecimal;
 import java.math.MathContext;
 import java.math.RoundingMode;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
-import java.util.function.Supplier;
 
 import static zir.lab2vmath.managers.Config.*;
 
@@ -59,12 +56,20 @@ public class EquationManager {
 
 
     public ResEntity getSolvingEquation() throws BadIntervalException {
-        if (!checkExistenceOfRoots()) {
+        checkRangeOfAcceptableValues();
+        if (  !checkExistenceOfRoots()  ) {
             throw new BadIntervalException("Ваш интервал слишком сложный для меня: на нем либо несколько корней, либо нет вообще. Можно что-то попроще?");
 
         }
         return methodMap.get(method).apply(args);
 
+    }
+
+    private void checkRangeOfAcceptableValues() throws BadIntervalException{
+        if (func == 3 && (args.get(firstBoundaryOfInterval).compareTo(new BigDecimal(-2)) <= 0 ||
+                args.get(secondBoundaryOfInterval).compareTo(new BigDecimal(-2)) <= 0)) {
+            throw new BadIntervalException("ну из одз зачем выходить-то?");
+        }
     }
 
     private boolean checkExistenceOfRoots() {
@@ -136,7 +141,8 @@ public class EquationManager {
         BigDecimal firstBoundaryOfInterval = args.get(Config.firstBoundaryOfInterval);
         BigDecimal secondBoundaryOfInterval = args.get(Config.secondBoundaryOfInterval);
         BigDecimal inaccuracy = args.get(Config.inaccuracy);
-        BigDecimal x = firstBoundaryOfInterval;
+        BigDecimal x = derivativeFunctionMap.get(func).apply(firstBoundaryOfInterval).abs()
+                .compareTo(derivativeFunctionMap.get(func).apply(secondBoundaryOfInterval).abs()) >= 0 ? firstBoundaryOfInterval : secondBoundaryOfInterval;
         BigDecimal lambda;
         if (derivativeFunctionMap.get(func).apply(firstBoundaryOfInterval).compareTo(BigDecimal.ZERO) >= 0) {
             lambda = new BigDecimal(-1);
@@ -160,6 +166,7 @@ public class EquationManager {
         return res;
     }
 
+    //1st
     private BigDecimal firstEquation(BigDecimal x) {
         return x.pow(3).multiply(new BigDecimal(-2.7))
                 .add(x.pow(2).multiply(new BigDecimal(-1.48)))
@@ -179,7 +186,7 @@ public class EquationManager {
 
     }
 
-
+    //2nd
     private BigDecimal secondEquation(BigDecimal x) {
         return x.pow(3).subtract(x).add(new BigDecimal(4));
     }
@@ -193,6 +200,7 @@ public class EquationManager {
 
     }
 
+    //3th
     private BigDecimal thirdEquation(BigDecimal x) {
         return new BigDecimal(Math.log10(x.doubleValue() + 2)).multiply(new BigDecimal(5)).subtract(new BigDecimal(3));
     }
