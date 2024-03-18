@@ -57,7 +57,7 @@ public class EquationManager {
 
     public ResEquationEntity getSolvingEquation() throws BadIntervalException {
         checkRangeOfAcceptableValues();
-        if (  !checkExistenceOfRoots()  ) {
+        if (!checkExistenceOfRoots()) {
             throw new BadIntervalException("Ваш интервал слишком сложный для меня: на нем либо несколько корней, либо нет вообще. Можно что-то попроще?");
 
         }
@@ -65,7 +65,7 @@ public class EquationManager {
 
     }
 
-    private void checkRangeOfAcceptableValues() throws BadIntervalException{
+    private void checkRangeOfAcceptableValues() throws BadIntervalException {
         if (func == 3 && (args.get(firstBoundaryOfInterval).compareTo(new BigDecimal(-2)) <= 0 ||
                 args.get(secondBoundaryOfInterval).compareTo(new BigDecimal(-2)) <= 0)) {
             throw new BadIntervalException("ну из одз зачем выходить-то?");
@@ -73,11 +73,28 @@ public class EquationManager {
     }
 
     private boolean checkExistenceOfRoots() {
+        boolean rootExistence = false;
+        BigDecimal previousValue;
         BigDecimal res = functionMap.get(func).apply(args.get(firstBoundaryOfInterval))
                 .multiply(functionMap.get(func).apply(args.get(secondBoundaryOfInterval)));
-
         if (res.compareTo(BigDecimal.ZERO) >= 0) {
             return false;
+        }
+        previousValue = args.get(firstBoundaryOfInterval);
+        for (BigDecimal i = args.get(firstBoundaryOfInterval).add(BigDecimal.valueOf(0.01));
+             i.compareTo(args.get(secondBoundaryOfInterval)) < 0;
+             i=i.add(BigDecimal.valueOf(0.01))) {
+            if (functionMap.get(func).apply(i)
+                    .multiply(functionMap.get(func).apply(previousValue)).compareTo(BigDecimal.ZERO) < 0) {
+                System.out.println("dsl;sdla;lsd");
+                System.out.println(i+" fun= "+functionMap.get(func).apply(i));
+                System.out.println(previousValue+" pfun = "+functionMap.get(func).apply(previousValue));
+                if (rootExistence) {
+                    return false;
+                }
+                rootExistence = true;
+            }
+            previousValue = i;
         }
         return true;
     }
@@ -121,10 +138,7 @@ public class EquationManager {
                 .compareTo(BigDecimal.ZERO) > 0) {
             x = secondBoundaryOfInterval;
         } else {
-            //todo wtf
-//            System.out.println(33333);
             x = firstBoundaryOfInterval;
-//            return null;
         }
 
         //todo chodimost'
@@ -132,7 +146,6 @@ public class EquationManager {
 
             x = x.subtract(functionMap.get(func).apply(x).divide(derivativeFunctionMap.get(func).apply(x), MathContext.DECIMAL32));
         }
-        System.out.println(x.toString());
         ResEquationEntity res = new ResEquationEntity(x.toString(), functionMap.get(func).apply(x).setScale(inaccuracy.scale() + 3, RoundingMode.UP).toString());
         return res;
     }
@@ -152,14 +165,8 @@ public class EquationManager {
         lambda = lambda.divide(
                 derivativeFunctionMap.get(func).apply(firstBoundaryOfInterval).abs()
                         .max(derivativeFunctionMap.get(func).apply(secondBoundaryOfInterval).abs()), new MathContext(inaccuracy.scale() + 2));
-        System.out.println("lambda " + lambda.toString());
-        int k = 0;
         while (functionMap.get(func).apply(x).abs().compareTo(inaccuracy) >= 0) {
-            k++;
-            System.out.println("koko " + functionMap.get(func).apply(x));
-
             x = lambda.multiply(functionMap.get(func).apply(x)).setScale(inaccuracy.scale() + 2, RoundingMode.UP).add(x);
-            System.out.println(x.toString());
         }
         ResEquationEntity res = new ResEquationEntity(x.toString(), functionMap.get(func).apply(x).setScale(inaccuracy.scale() + 3, RoundingMode.UP).toString());
 
@@ -168,35 +175,43 @@ public class EquationManager {
 
     //1st
     private BigDecimal firstEquation(BigDecimal x) {
-        return x.pow(3).multiply(new BigDecimal(-2.7))
-                .add(x.pow(2).multiply(new BigDecimal(-1.48)))
+        return x.pow(3).multiply(BigDecimal.valueOf(-2.7))
+                .add(x.pow(2).multiply(BigDecimal.valueOf(-1.48)))
                 .add(x.multiply(new BigDecimal(19.23)))
                 .add(new BigDecimal(6.35));
+//        -2.7x^3-1.48x^2+19.23x+6.35
     }
 
     private BigDecimal derivativeFirstEquation(BigDecimal x) {
-        return x.pow(2).multiply(new BigDecimal(-2.7))
-                .add(x.pow(1).multiply(new BigDecimal(-1.48)))
+        return x.pow(2).multiply(BigDecimal.valueOf(-2.7 * 3))
+                .add(x.pow(1).multiply(BigDecimal.valueOf(-1.48 * 2)))
                 .add(new BigDecimal(19.23));
+//        -2.7*3x^2-1.48*2x+19.23
     }
 
     private BigDecimal secondDerivativeFirstEquation(BigDecimal x) {
-        return x.pow(1).multiply(new BigDecimal(-2.7))
-                .add((new BigDecimal(-1.48)));
+        return x.pow(1).multiply(new BigDecimal(-2.7*6))
+                .add((new BigDecimal(-1.48*2)));
+        //        -2.7*3*2x-1.48*2
+
+
 
     }
 
     //2nd
     private BigDecimal secondEquation(BigDecimal x) {
         return x.pow(3).subtract(x).add(new BigDecimal(4));
+        //x^3-x+4
     }
 
     private BigDecimal derivativeSecondEquation(BigDecimal x) {
         return x.pow(2).multiply(new BigDecimal(3)).subtract(BigDecimal.ONE);
+//        3x^2-1
     }
 
     private BigDecimal secondDerivativeSecondEquation(BigDecimal x) {
         return x.multiply(new BigDecimal(6));
+//        6x
 
     }
 

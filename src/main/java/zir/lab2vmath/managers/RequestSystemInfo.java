@@ -23,15 +23,15 @@ public class RequestSystemInfo {
     private int method;
 
     @NotNull(message = "the initial approximation by X must not be null")
-    @Pattern(regexp = "^[-+]?[0-9]*\\.?[0-9]+([eE][-+]?[0-9]+)?$")
+    @Pattern(regexp = "^[-+]?[0-9]*[\\.,]?[0-9]+([eE][-+]?[0-9]+)?$")
     private String initialApproximationByX;
     @NotNull(message = "the initial approximation by Y must not be null")
-    @Pattern(regexp = "^[-+]?[0-9]*\\.?[0-9]+([eE][-+]?[0-9]+)?$")
+    @Pattern(regexp = "^[-+]?[0-9]*[\\.,]?[0-9]+([eE][-+]?[0-9]+)?$")
     private String initialApproximationByY;
     @NotNull
     @DecimalMin(value = "0", message = "inaccuracy must be greater than or equal to 0")
     @DecimalMax(value = "0.1", message = "inaccuracy must be less than or equal to 0.1")
-    @Pattern(regexp = "^[-+]?[0-9]*\\.?[0-9]+([eE][-+]?[0-9]+)?$")
+    @Pattern(regexp = "^[-+]?[0-9]*[\\.,]?[0-9]+([eE][-+]?[0-9]+)?$")
     private String inaccuracy;
 
 }

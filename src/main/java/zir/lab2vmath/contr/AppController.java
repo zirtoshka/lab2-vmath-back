@@ -92,14 +92,12 @@ public class AppController {
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<Map<String, String>> handleValidationExceptions(  MethodArgumentNotValidException ex) {
-        System.out.println("eroooooooooor");
-        Map<String, String> errors = new HashMap<>();
+    public ResponseEntity<String> handleValidationExceptions(  MethodArgumentNotValidException ex) {
+        StringBuilder  errors =new StringBuilder();
         ex.getBindingResult().getAllErrors().forEach((error) -> {
-            String fieldName = ((FieldError) error).getField();
             String errorMessage = error.getDefaultMessage();
-            errors.put(fieldName, errorMessage);
+            errors.append(errorMessage+"\n");
         });
-        return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(errors.toString(), HttpStatus.BAD_REQUEST);
     }
 }
