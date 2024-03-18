@@ -70,7 +70,7 @@ public class SystemManager {
             numberOfIterations++;
             xy[0] = x;
             xy[1] = y;
-            x=systemMapX.get(system).apply(xy).setScale(inaccuracy.scale() + 5, RoundingMode.UP);
+            x = systemMapX.get(system).apply(xy).setScale(inaccuracy.scale() + 5, RoundingMode.UP);
 //            x = secondSystemX(xy).setScale(inaccuracy.scale() + 5, RoundingMode.UP);
             y = systemMapY.get(system).apply(xy).setScale(inaccuracy.scale() + 5, RoundingMode.UP);
 
@@ -79,7 +79,8 @@ public class SystemManager {
                 y.subtract(xy[1]).abs().compareTo(inaccuracy) >= 0);
 
 
-        return new ResSystemEntity(x.toString(), y.toString(), numberOfIterations);
+        return new ResSystemEntity(x.toString(), y.toString(), numberOfIterations,
+                x.subtract(xy[0]).abs().toString(), y.subtract(xy[1]).abs().toString());
 
     }
 
@@ -87,18 +88,15 @@ public class SystemManager {
         BigDecimal x = xy[0];
         BigDecimal y = xy[1];
 
-        if ((BigDecimal.valueOf(Math.sin(y.doubleValue())/3) .abs()).compareTo(BigDecimal.ONE) > 0) {
-            System.out.println("111111ssss");
+        if ((BigDecimal.valueOf(Math.sin(y.doubleValue()) / 3).abs()).compareTo(BigDecimal.ONE) > 0) {
             return false;
         }
         if (
-                BigDecimal.valueOf(Math.cos((5*x.doubleValue()-3)/5))
+                BigDecimal.valueOf(Math.cos((5 * x.doubleValue() - 3) / 5))
                         .abs().compareTo(BigDecimal.ONE) > 0
         ) {
-            System.out.println("akakaka");
             return false;
         }
-        System.out.println("kokokoo");
         return true;
     }
 
@@ -109,11 +107,9 @@ public class SystemManager {
     }
 
     private BigDecimal firstSystemY(BigDecimal[] xy) {
-        return BigDecimal.valueOf(Math.sin(xy[0].doubleValue()-0.6))
+        return BigDecimal.valueOf(Math.sin(xy[0].doubleValue() - 0.6))
                 .add(BigDecimal.valueOf(-1.6));
     }
-
-
 
 
 //    private boolean checkFirstSystem(BigDecimal[] xy) {
@@ -176,17 +172,14 @@ public class SystemManager {
         BigDecimal y = xy[1];
         if (x.multiply(BigDecimal.valueOf(-0.2)).abs()
                 .add(y.multiply(BigDecimal.valueOf(-0.4)).abs()).compareTo(BigDecimal.ONE) > 0) {
-            System.out.println("gogogog");
             return false;
         }
         if ((x.multiply(BigDecimal.valueOf(-0.4))
                 .add(y.multiply(BigDecimal.valueOf(-0.1)))).abs()
                 .add(x.multiply(BigDecimal.valueOf(-0.1)).abs()).compareTo(BigDecimal.ONE) > 0
         ) {
-            System.out.println("akakaka");
             return false;
         }
-        System.out.println("kokokoo");
         return true;
     }
 }

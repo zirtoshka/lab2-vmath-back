@@ -83,12 +83,9 @@ public class EquationManager {
         previousValue = args.get(firstBoundaryOfInterval);
         for (BigDecimal i = args.get(firstBoundaryOfInterval).add(BigDecimal.valueOf(0.01));
              i.compareTo(args.get(secondBoundaryOfInterval)) < 0;
-             i=i.add(BigDecimal.valueOf(0.01))) {
+             i = i.add(BigDecimal.valueOf(0.01))) {
             if (functionMap.get(func).apply(i)
                     .multiply(functionMap.get(func).apply(previousValue)).compareTo(BigDecimal.ZERO) < 0) {
-                System.out.println("dsl;sdla;lsd");
-                System.out.println(i+" fun= "+functionMap.get(func).apply(i));
-                System.out.println(previousValue+" pfun = "+functionMap.get(func).apply(previousValue));
                 if (rootExistence) {
                     return false;
                 }
@@ -105,7 +102,9 @@ public class EquationManager {
         BigDecimal secondBoundaryOfInterval = args.get(Config.secondBoundaryOfInterval);
         BigDecimal inaccuracy = args.get(Config.inaccuracy);
         BigDecimal x = firstBoundaryOfInterval.add(secondBoundaryOfInterval).divide(new BigDecimal(2));
+        int numberOfIterations = 0;
         while (functionMap.get(func).apply(x).abs().compareTo(inaccuracy) >= 0) {
+            numberOfIterations++;
             if (functionMap.get(func).apply(x)
                     .multiply(functionMap.get(func).apply(firstBoundaryOfInterval))
                     .compareTo(BigDecimal.ZERO) >= 0) { //if same sign
@@ -117,8 +116,7 @@ public class EquationManager {
 
 
         }
-//        x = x.setScale(inaccuracy.scale(), RoundingMode.UP);
-        ResEquationEntity res = new ResEquationEntity(x.toString(), functionMap.get(func).apply(x).setScale(inaccuracy.scale() + 3, RoundingMode.UP).toString());
+        ResEquationEntity res = new ResEquationEntity(x.toString(), functionMap.get(func).apply(x).setScale(inaccuracy.scale() + 3, RoundingMode.UP).toString(), numberOfIterations);
 
 
         return res;
@@ -129,6 +127,8 @@ public class EquationManager {
         BigDecimal secondBoundaryOfInterval = args.get(Config.secondBoundaryOfInterval);
         BigDecimal inaccuracy = args.get(Config.inaccuracy);
         BigDecimal x;
+        int numberOfIterations = 0;
+
         if (functionMap.get(func).apply(firstBoundaryOfInterval)
                 .multiply(secondDerivativeFunctionMap.get(func).apply(firstBoundaryOfInterval))
                 .compareTo(BigDecimal.ZERO) > 0) {
@@ -143,10 +143,10 @@ public class EquationManager {
 
         //todo chodimost'
         while (functionMap.get(func).apply(x).abs().compareTo(inaccuracy) >= 0) {
-
+            numberOfIterations++;
             x = x.subtract(functionMap.get(func).apply(x).divide(derivativeFunctionMap.get(func).apply(x), MathContext.DECIMAL32));
         }
-        ResEquationEntity res = new ResEquationEntity(x.toString(), functionMap.get(func).apply(x).setScale(inaccuracy.scale() + 3, RoundingMode.UP).toString());
+        ResEquationEntity res = new ResEquationEntity(x.toString(), functionMap.get(func).apply(x).setScale(inaccuracy.scale() + 3, RoundingMode.UP).toString(), numberOfIterations);
         return res;
     }
 
@@ -157,6 +157,7 @@ public class EquationManager {
         BigDecimal x = derivativeFunctionMap.get(func).apply(firstBoundaryOfInterval).abs()
                 .compareTo(derivativeFunctionMap.get(func).apply(secondBoundaryOfInterval).abs()) >= 0 ? firstBoundaryOfInterval : secondBoundaryOfInterval;
         BigDecimal lambda;
+        int numberOfIterations = 0;
         if (derivativeFunctionMap.get(func).apply(firstBoundaryOfInterval).compareTo(BigDecimal.ZERO) >= 0) {
             lambda = new BigDecimal(-1);
         } else {
@@ -165,10 +166,19 @@ public class EquationManager {
         lambda = lambda.divide(
                 derivativeFunctionMap.get(func).apply(firstBoundaryOfInterval).abs()
                         .max(derivativeFunctionMap.get(func).apply(secondBoundaryOfInterval).abs()), new MathContext(inaccuracy.scale() + 2));
+        for (BigDecimal i = firstBoundaryOfInterval.add(BigDecimal.valueOf(0.01));
+             i.compareTo(secondBoundaryOfInterval) < 0;
+             i = i.add(BigDecimal.valueOf(0.01))) {
+            if (lambda.multiply(derivativeFunctionMap.get(func).apply(i)).add(BigDecimal.ONE).abs().compareTo(BigDecimal.ONE) >= 0) {
+                System.out.println(lambda.multiply(derivativeFunctionMap.get(func).apply(i)).add(BigDecimal.ONE));
+                return null;
+            }
+        }
         while (functionMap.get(func).apply(x).abs().compareTo(inaccuracy) >= 0) {
+            numberOfIterations++;
             x = lambda.multiply(functionMap.get(func).apply(x)).setScale(inaccuracy.scale() + 2, RoundingMode.UP).add(x);
         }
-        ResEquationEntity res = new ResEquationEntity(x.toString(), functionMap.get(func).apply(x).setScale(inaccuracy.scale() + 3, RoundingMode.UP).toString());
+        ResEquationEntity res = new ResEquationEntity(x.toString(), functionMap.get(func).apply(x).setScale(inaccuracy.scale() + 3, RoundingMode.UP).toString(),numberOfIterations);
 
         return res;
     }
@@ -190,10 +200,9 @@ public class EquationManager {
     }
 
     private BigDecimal secondDerivativeFirstEquation(BigDecimal x) {
-        return x.pow(1).multiply(new BigDecimal(-2.7*6))
-                .add((new BigDecimal(-1.48*2)));
+        return x.pow(1).multiply(new BigDecimal(-2.7 * 6))
+                .add((new BigDecimal(-1.48 * 2)));
         //        -2.7*3*2x-1.48*2
-
 
 
     }
