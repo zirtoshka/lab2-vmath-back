@@ -141,7 +141,6 @@ public class EquationManager {
             x = firstBoundaryOfInterval;
         }
 
-        //todo chodimost'
         while (functionMap.get(func).apply(x).abs().compareTo(inaccuracy) >= 0) {
             numberOfIterations++;
             x = x.subtract(functionMap.get(func).apply(x).divide(derivativeFunctionMap.get(func).apply(x), MathContext.DECIMAL32));
